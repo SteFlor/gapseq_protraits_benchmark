@@ -108,13 +108,16 @@ for model_file in os.listdir("AllModels/")[start_index:end_index]:
 update_medium(models, "gapseq_to_protraits.csv", caloric_equivalence_normalizer)
 uptakes_df, growth_products_df, boundaries_dict = get_uptakes_and_products_FVA(models)
 
-uptakes_df.to_csv("dataframes_FVA_1/uptakes_df_"+str(batch_num)+".csv")
+outdir = "FVA_1/"
+os.makedirs(outdir, exist_ok=True)
 
-growth_products_df.to_csv("dataframes_FVA_1/growth_products_df_"+str(batch_num)+".csv")
+uptakes_df.to_csv(outdir + "uptakes_df_"+str(batch_num)+".csv")
+
+growth_products_df.to_csv(outdir + "growth_products_df_"+str(batch_num)+".csv")
 
 mediums_df = fill_mediums_dfs(models)
 
-mediums_df.to_csv("dataframes_FVA_1/mediums_df_"+str(batch_num)+".csv")
+mediums_df.to_csv(outdir + "mediums_df_"+str(batch_num)+".csv")
 
 #all_boundaries = set()
 #for model in boundaries_dict.keys():
