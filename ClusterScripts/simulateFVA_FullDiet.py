@@ -103,6 +103,8 @@ frac_opt_perc = str(int(frac_opt*100))
 last_index = len(os.listdir(models_dir + "/"))-1
 start_index = batch_size*batch_num
 end_index= min(start_index + batch_size, last_index)
+outdir = "dataframes_FVA_" + frac_opt_perc + "_fullmedium"
+os.makedirs(outdir, exist_ok=True)
 
 models = dict()
 for model_file in os.listdir(models_dir + "/")[start_index:end_index]:
@@ -111,13 +113,13 @@ for model_file in os.listdir(models_dir + "/")[start_index:end_index]:
 update_medium(models, "dat/gapseq_to_protraits.csv", 400) #arbitrary value that fits the threshold of 2.0 on resulting uptakes for detection of growth
 uptakes_df, growth_products_df, boundaries_dict = get_uptakes_and_products_FVA(models, fraction_of_optimum = frac_opt)
 
-uptakes_df.to_csv("dataframes_FVA_fulldiet_"+ frac_opt_perc +"_fullmedium/uptakes_df_"+str(batch_num)+".csv")
+uptakes_df.to_csv(outdir + "/uptakes_df_"+str(batch_num)+".csv")
 
-growth_products_df.to_csv("dataframes_FVA_fulldiet_" + frac_opt_perc + "_fullmedium/growth_products_df_"+str(batch_num)+".csv")
+growth_products_df.to_csv(outdir + "/growth_products_df_"+str(batch_num)+".csv")
 
 mediums_df = fill_mediums_dfs(models)
 
-mediums_df.to_csv("dataframes_FVA_fulldiet_" + frac_opt_perc + "_fullmedium/mediums_df_"+str(batch_num)+".csv")
+mediums_df.to_csv(outdir + "/mediums_df_"+str(batch_num)+".csv")
 
 
 
