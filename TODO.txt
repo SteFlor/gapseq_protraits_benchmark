@@ -1,10 +1,6 @@
-- create output table with all predicted phenotypes denoted by 0s (phenotype absent) and 1s (phenotype present)
-
 - adapt the medium for each substrate separately and test if a bacterium can grow on each carbon source exclusively (instead of just checking if the bacterium can uptake the molecule)
 
-- try gapseq -w approach
+- try gapseq -w approach to predict growth on substrates based on electron donors. This should increase specificity
 
-- main.py line 50: replace all occurrences of .max() with an argument (e.g. via groupby(...).agg(["max"]) or smth similar)
-
-- main.py line 65: move the " Exchange" postfix handling in the "clean_dupli..." accessory function
+- main.py: replace all occurrences of .max() with an argument (e.g. via groupby(...).agg(["max"]) or smth similar)
 
