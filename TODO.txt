@@ -1,3 +1,5 @@
+- add argparse to allow to specify input and output folders for the main.py file
+
 - adapt the medium for each substrate separately and test if a bacterium can grow on each carbon source exclusively (instead of just checking if the bacterium can uptake the molecule)
 
 - try gapseq -w approach to predict growth on substrates based on electron donors. This should increase specificity
