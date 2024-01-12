@@ -16,10 +16,11 @@ micromamba activate gapseq_benchmark
 
 # Script to calculate the total number of batches
 MODEL_DIR="AllModels"
+FRACTION_OF_OPTIMUM=0.01
 BATCH_SIZE=200  # Change this to your desired batch size
 NUM_MODELS=$(ls -1q $MODEL_DIR | wc -l)
 NUM_BATCHES=$((($NUM_MODELS + $BATCH_SIZE - 1) / $BATCH_SIZE))
 
 # Run the Python script
-python3 simulateFVA.py $SLURM_ARRAY_TASK_ID $BATCH_SIZE
+python3 simulateFVA_FullDiet.py $SLURM_ARRAY_TASK_ID $BATCH_SIZE $MODEL_DIR $FRACTION_OF_OPTIMUM
 

@@ -11,24 +11,24 @@ import argparse
 parser = argparse.ArgumentParser(description='Process batch number and size.')
 parser.add_argument('batch_num', type=int, help='Batch number for processing')
 parser.add_argument('batch_size', type=int, help='Size of each batch')
+parser.add_argument('models_dir', type=str, help='Directory where the input models are')
+parser.add_argument('frac_opt', type=float, help='Fraction of optimum for FVA simulation')
 args = parser.parse_args()
 
 
-def update_medium(models, reac_map_path, caloric_equivalence_normalizer):
+def update_medium(models, reac_map_path, inflow_value):
 
     reac_map = pd.read_csv(reac_map_path, index_col = 1)
     medium_toadd = dict()
     for protraits_id in set(reac_map.index):
         medium_toadd[protraits_id] = [vals[0] if len(vals)==1 else vals for vals in reac_map.loc[protraits_id].values]
-        #medium_toadd[protraits_id] = [vals[0] for vals in reac_map.loc[protraits_id].values()]
     for model in models:
         for metabs in medium_toadd.values():
             print(metabs)
             for metab in metabs:
                 current_metab_and_model_ex_reacs = [reac for reac in models[model].boundary if reac.name.replace("-e0 Exchange","").replace("-e0","") == metab]
                 for reac in current_metab_and_model_ex_reacs:
-                    #print(reac)
-                    reac.lower_bound = -caloric_equivalence_normalizer/list(reac.metabolites.keys())[0].formula_weight # a rough way to keep the "caloric input" of each uptake comparable among each other
+                    reac.lower_bound = -inflow_value/list(reac.metabolites.keys())[0].formula_weight # a rough way to keep the "caloric input" of each uptake comparable among each other
                     print(reac.id)
                     print(reac.lower_bound)
 
@@ -45,12 +45,13 @@ def fill_mediums_dfs(models, exchange_reac_name_postfix="-e0 Exchange"): #takes 
         medium = {reac.name.replace(exchange_reac_name_postfix,""): -reac.lower_bound for reac in model.boundary if reac.lower_bound < 0}
         medium = pd.Series(medium)
         mediums_df[model_key] = medium
+
     #transform mediums_df dictionary into a dataframe
     mediums_df = pd.DataFrame(mediums_df)
     return mediums_df
 
 
-def get_uptakes_and_products_FVA(models, exchange_reac_name_postfix="-e0 Exchange", normalize_by_growth=True, fraction_of_optimum = 0.10):
+def get_uptakes_and_products_FVA(models, exchange_reac_name_postfix="-e0 Exchange", normalize_by_growth=True, fraction_of_optimum = 0.01):
     boundaries_dict = dict()
     uptakes_df = dict()
     growth_products_df = dict()
@@ -96,32 +97,27 @@ def get_uptakes_and_products_FVA(models, exchange_reac_name_postfix="-e0 Exchang
 
 batch_num = args.batch_num
 batch_size = args.batch_size
-last_index = len(os.listdir("AllModels/"))-1
+models_dir = args.models_dir
+frac_opt = args.frac_opt
+frac_opt_perc = str(int(frac_opt*100))
+last_index = len(os.listdir(models_dir + "/"))-1
 start_index = batch_size*batch_num
 end_index= min(start_index + batch_size, last_index)
-caloric_equivalence_normalizer = 400
 
 models = dict()
-for model_file in os.listdir("AllModels/")[start_index:end_index]:
-    models[model_file.replace(".xml","")] = cobra.io.read_sbml_model("AllModels/" + model_file)
+for model_file in os.listdir(models_dir + "/")[start_index:end_index]:
+    models[model_file.replace(".xml","")] = cobra.io.read_sbml_model(models_dir + "/" + model_file)
 
-update_medium(models, "gapseq_to_protraits.csv", caloric_equivalence_normalizer)
-uptakes_df, growth_products_df, boundaries_dict = get_uptakes_and_products_FVA(models)
+update_medium(models, "dat/gapseq_to_protraits.csv", 400) #arbitrary value that fits the threshold of 2.0 on resulting uptakes for detection of growth
+uptakes_df, growth_products_df, boundaries_dict = get_uptakes_and_products_FVA(models, fraction_of_optimum = frac_opt)
 
-outdir = "FVA_1/"
-os.makedirs(outdir, exist_ok=True)
+uptakes_df.to_csv("dataframes_FVA_fulldiet_"+ frac_opt_perc +"_fullmedium/uptakes_df_"+str(batch_num)+".csv")
 
-uptakes_df.to_csv(outdir + "uptakes_df_"+str(batch_num)+".csv")
-
-growth_products_df.to_csv(outdir + "growth_products_df_"+str(batch_num)+".csv")
+growth_products_df.to_csv("dataframes_FVA_fulldiet_" + frac_opt_perc + "_fullmedium/growth_products_df_"+str(batch_num)+".csv")
 
 mediums_df = fill_mediums_dfs(models)
 
-mediums_df.to_csv(outdir + "mediums_df_"+str(batch_num)+".csv")
-
-#all_boundaries = set()
-#for model in boundaries_dict.keys():
-#    all_boundaries = all_boundaries.union(boundaries_dict[model])
+mediums_df.to_csv("dataframes_FVA_fulldiet_" + frac_opt_perc + "_fullmedium/mediums_df_"+str(batch_num)+".csv")
 
 
 
