@@ -1,5 +1,13 @@
-# Ignore everything in the DataframesFromCluster directory
-DataFramesFromCluster/*
 
-# But not the directory itself
+DataFramesFromCluster/*
+AllModels/*
+ClusterScripts/output_log/*
+ClusterScripts/error_log/*
+Genomes/*
+
 !DataFramesFromCluster/.gitkeep
+!AllModels/.gitkeep
+!ClusterScripts/output_log/.gitkeep
+!ClusterScripts/error_log/.gitkeep
+!Genomes/.gitkeep
+
