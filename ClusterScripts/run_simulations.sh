@@ -14,13 +14,18 @@
 source ~/.bashrc
 micromamba activate gapseq_benchmark
 
-# Script to calculate the total number of batches
-MODEL_DIR="AllModels"
 FRACTION_OF_OPTIMUM=0.01
+MODEL_DIR="../AllModels"
+NO_MODEL_DIR="../AllGapseqOutputsButModels"
+OUTDIR="../DataFramesFromCluster"
+#move all the files of the folder AllModels that are not the finished xml model into a new folder called AllGapseqOutputsButModels
+mv $MODEL_DIR/*[!genomic.xml] $NO_MODEL_DIR/
+
+# Script to calculate the total number of batches
 BATCH_SIZE=200  # Change this to your desired batch size
 NUM_MODELS=$(ls -1q $MODEL_DIR | wc -l)
 NUM_BATCHES=$((($NUM_MODELS + $BATCH_SIZE - 1) / $BATCH_SIZE))
 
 # Run the Python script
-python3 simulateFVA_FullDiet.py $SLURM_ARRAY_TASK_ID $BATCH_SIZE $MODEL_DIR $FRACTION_OF_OPTIMUM
+python3 simulateFVA_FullDiet.py $SLURM_ARRAY_TASK_ID $BATCH_SIZE $MODEL_DIR $FRACTION_OF_OPTIMUM $OUTDIR
 

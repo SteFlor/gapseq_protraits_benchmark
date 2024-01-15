@@ -13,6 +13,7 @@ parser.add_argument('batch_num', type=int, help='Batch number for processing')
 parser.add_argument('batch_size', type=int, help='Size of each batch')
 parser.add_argument('models_dir', type=str, help='Directory where the input models are')
 parser.add_argument('frac_opt', type=float, help='Fraction of optimum for FVA simulation')
+parser.add_argument('out_dir', type=str, help='Directory where the output dataframes will be stored')
 args = parser.parse_args()
 
 
@@ -103,7 +104,8 @@ frac_opt_perc = str(int(frac_opt*100))
 last_index = len(os.listdir(models_dir + "/"))-1
 start_index = batch_size*batch_num
 end_index= min(start_index + batch_size, last_index)
-outdir = "dataframes_FVA_" + frac_opt_perc + "_fullmedium"
+outdir_prefix = args.out_dir
+outdir = outdir_prefix + "/dataframes_FVA_" + frac_opt_perc + "_fullmedium"
 os.makedirs(outdir, exist_ok=True)
 
 models = dict()
