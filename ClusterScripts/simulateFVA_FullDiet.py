@@ -109,7 +109,8 @@ outdir = outdir_prefix + "/dataframes_FVA_" + frac_opt_perc + "_fullmedium"
 os.makedirs(outdir, exist_ok=True)
 
 models = dict()
-for model_file in os.listdir(models_dir + "/")[start_index:end_index]:
+model_files = [model_file for model_file in os.listdir(models_dir + "/") if model_file.endswith("genomic.xml")]
+for model_file in model_files[start_index:end_index]:
     models[model_file.replace(".xml","")] = cobra.io.read_sbml_model(models_dir + "/" + model_file)
 
 update_medium(models, "dat/gapseq_to_protraits.csv", 400) #arbitrary value that fits the threshold of 2.0 on resulting uptakes for detection of growth
